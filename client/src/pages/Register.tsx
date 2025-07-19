@@ -1,5 +1,7 @@
+import LoginRegisterForm from "../components/LoginRegisterForm";
+
 const Register = () => {
-    return <div className="text-red-500">Register</div>;
+    return <LoginRegisterForm formType="Register" />;
 };
 
 export default Register;
