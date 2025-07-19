@@ -74,11 +74,9 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
     public async Task DeleteAsync(HttpContext context)
     {
         User? user =
-            await db
-                .Users.Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u =>
-                    u.Id == Guid.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
-                ) ?? throw new BadRequestException("User not found.");
+            await db.Users.FindAsync(
+                Guid.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            ) ?? throw new BadRequestException("User not found.");
 
         db.Users.Remove(user);
         await db.SaveChangesAsync();
