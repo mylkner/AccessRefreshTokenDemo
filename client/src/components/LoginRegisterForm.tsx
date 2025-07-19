@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import Spinner from "./Spinner";
 import axios, { AxiosError } from "axios";
+import { useAuth } from "../context/UserContext";
 
 interface FormData {
     username: string;
@@ -14,13 +15,21 @@ interface LoginRegisterFormProps {
 }
 
 const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
+    const { setAccessToken } = useAuth();
     const navigate = useNavigate();
     const mutation = useMutation({
-        mutationFn: async (formData: FormData) => {
+        mutationFn: async (formData: FormData): Promise<string> => {
             setFormData({ username: "", password: "" });
-            await axios.post(`/api/auth/${formType.toLowerCase()}`, formData);
+            const res = await axios.post(
+                `/api/auth/${formType.toLowerCase()}`,
+                formData
+            );
+            return res.data;
         },
-        onSuccess: () => navigate("/dashboard"),
+        onSuccess: (data) => {
+            setAccessToken(data);
+            navigate("/dashboard");
+        },
     });
 
     const [formData, setFormData] = useState<FormData>({
