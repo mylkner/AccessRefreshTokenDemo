@@ -15,6 +15,9 @@ public class BadRequestException(string message, bool userSafe = false)
 public class UnauthorizedException(string message, bool userSafe = false)
     : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Unauthorized);
 
+public class RefreshTokenException(string message, bool userSafe = false)
+    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Unauthorized);
+
 public class ForbiddenException(string message, bool userSafe = false)
     : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Forbidden);
 
