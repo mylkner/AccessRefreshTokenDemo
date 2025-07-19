@@ -7,6 +7,7 @@ import AdminPage from "./pages/AdminPage";
 import NonAdminPage from "./pages/NonAdminPage";
 import AdminLayout from "./routes/AdminLayout";
 import Dashboard from "./pages/Dashboard";
+import { AuthProvider } from "./context/UserContext";
 
 function App() {
     return (
@@ -15,13 +16,16 @@ function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
-                <Route element={<AuthLayout />}>
-                    <Route path="/dashboard" element={<Dashboard />} />
-                    <Route path="/non-admin" element={<NonAdminPage />} />
-                    <Route element={<AdminLayout />}>
-                        <Route path="/admin" element={<AdminPage />} />
+
+                <AuthProvider>
+                    <Route element={<AuthLayout />}>
+                        <Route path="/dashboard" element={<Dashboard />} />
+                        <Route path="/non-admin" element={<NonAdminPage />} />
+                        <Route element={<AdminLayout />}>
+                            <Route path="/admin" element={<AdminPage />} />
+                        </Route>
                     </Route>
-                </Route>
+                </AuthProvider>
             </Routes>
         </BrowserRouter>
     );
