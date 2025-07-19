@@ -16,6 +16,9 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
     {
         ProblemDetails errorRes = new();
 
+        if (exception is RefreshTokenException)
+            httpContext.Response.Cookies.Delete("refreshToken");
+
         if (exception is CustomExceptionBase customException && customException.UserSafe)
         {
             errorRes.Detail = customException.Message;
