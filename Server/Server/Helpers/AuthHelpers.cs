@@ -3,8 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Server.Models.Db;
-using Server.Models.Dtos;
+using Server.Data.Schema;
+using Server.Models;
 
 namespace Server.Helpers;
 
