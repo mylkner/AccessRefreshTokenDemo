@@ -50,24 +50,13 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
 
     public async Task LogoutAsync(HttpContext context)
     {
-        User? user =
-            await db
-                .Users.Include(u => u.RefreshTokens)
-                .FirstOrDefaultAsync(u =>
-                    u.Id == Guid.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
-                ) ?? throw new BadRequestException("User not found.");
-
         RefreshTokenDto refreshToken = AuthHelpers.ParseRefreshToken(context)!;
-        UserRefreshToken? userRefreshToken = user.RefreshTokens.Find(rt =>
-            rt.Id == refreshToken.TokenId
-        );
+        UserRefreshToken? userRefreshToken =
+            await db.UserRefreshTokens.FindAsync(refreshToken.TokenId)
+            ?? throw new RefreshTokenException("Missing refresh token from db.");
 
-        if (userRefreshToken is not null)
-        {
-            db.UserRefreshTokens.Remove(userRefreshToken);
-            await db.SaveChangesAsync();
-        }
-
+        db.UserRefreshTokens.Remove(userRefreshToken);
+        await db.SaveChangesAsync();
         context.Response.Cookies.Delete("refreshToken");
     }
 
@@ -104,7 +93,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         )
         {
             await db.SaveChangesAsync();
-            throw new RefreshTokenException("Invalid hash in refresh token.");
+            throw new RefreshTokenException("Invalid refresh token value.");
         }
 
         if (userRefreshToken.Expiry <= DateTime.UtcNow)
