@@ -1,4 +1,4 @@
-namespace Server.Models.Db;
+namespace Server.Data.Schema;
 
 public class User
 {
