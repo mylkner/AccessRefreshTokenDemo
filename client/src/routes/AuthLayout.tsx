@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from "react-router";
+import { useAuth } from "../context/UserContext";
 
 const AuthLayout = () => {
-    const user: string | null = null; //placeholder
-    return user == null ? <Navigate to="/" /> : <Outlet />;
+    const { accessToken } = useAuth();
+    return accessToken == null ? <Navigate to="/" /> : <Outlet />;
 };
 
 export default AuthLayout;
