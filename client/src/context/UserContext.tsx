@@ -2,7 +2,7 @@ import { createContext, useContext, useState, type Dispatch } from "react";
 
 interface AuthContextProps {
     accessToken: string | null;
-    setAccessToken: Dispatch<React.SetStateAction<null>> | null;
+    setAccessToken: Dispatch<React.SetStateAction<string | null>> | null;
 }
 
 interface AuthProviderProps {
@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthContextProps>({
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [accessToken, setAccessToken] = useState(null);
+    const [accessToken, setAccessToken] = useState<string | null>(null);
 
     return (
         <AuthContext.Provider value={{ accessToken, setAccessToken }}>
