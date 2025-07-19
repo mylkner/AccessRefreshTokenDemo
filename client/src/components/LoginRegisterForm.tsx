@@ -20,16 +20,13 @@ const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
             setFormData({ username: "", password: "" });
             await axios.post(`/api/auth/${formType.toLowerCase()}`, formData);
         },
+        onSuccess: () => navigate("/dashboard"),
     });
 
     const [formData, setFormData] = useState<FormData>({
         username: "",
         password: "",
     });
-
-    if (mutation.isSuccess) {
-        navigate("/dashboard");
-    }
 
     const inputClass: string =
         "px-5 py-3 bg-gray-800 rounded w-full focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-700";
