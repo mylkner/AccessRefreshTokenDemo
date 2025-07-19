@@ -1,7 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import axios from "axios";
-import { createContext, useContext, useState, type Dispatch } from "react";
-import Spinner from "../components/Spinner";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    type Dispatch,
+} from "react";
 
 interface AuthContextProps {
     accessToken: string | null;
@@ -15,28 +18,17 @@ interface AuthProviderProps {
 const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
-    const [accessToken, setAccessToken] = useState<string | null>(null);
+    const [accessToken, setAccessToken] = useState<string | null>(
+        localStorage.getItem("accessToken")
+    );
 
-    const { isPending } = useQuery({
-        queryKey: ["checkAuth"],
-        queryFn: async () => {
-            const { data } = await axios.get("/api/auth/refresh-token", {
-                withCredentials: true,
-            });
-            setAccessToken(data);
-            return data;
-        },
-        retry: false,
-        refetchOnWindowFocus: false,
-    });
-
-    if (isPending) {
-        return (
-            <div className="flex items-center justify-center h-screen w-screen">
-                <Spinner />
-            </div>
-        );
-    }
+    useEffect(() => {
+        if (accessToken) {
+            localStorage.setItem("accessToken", accessToken);
+        } else {
+            localStorage.removeItem("accessToken");
+        }
+    }, [accessToken]);
 
     return (
         <AuthContext.Provider value={{ accessToken, setAccessToken }}>
