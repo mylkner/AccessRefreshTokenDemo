@@ -108,8 +108,8 @@ public static class AuthHelpers
         string[] parts = cookie.Split(":");
         if (parts.Length != 2)
             throw new RefreshTokenException("Cookie in invalid format.");
-        if (!Guid.TryParse(parts[0], out _))
+        if (!Guid.TryParse(parts[0], out Guid id))
             throw new RefreshTokenException("Invalid token ID in cookie.");
-        return new() { TokenId = parts[0], TokenValue = parts[1] };
+        return new() { TokenId = id, TokenValue = parts[1] };
     }
 }
