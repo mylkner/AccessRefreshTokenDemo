@@ -24,7 +24,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
                 HashedPassword = Convert.ToBase64String(
                     AuthHelpers.HashString(req.Password, Convert.FromBase64String(salt))
                 ),
-                Salt = AuthHelpers.GenerateRandomString(16),
+                Salt = salt,
                 Role = "User",
             }
         );
@@ -34,6 +34,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
     public async Task<string> LoginAsync(UserDto req, HttpContext context)
     {
         User? user = await db.Users.FirstOrDefaultAsync(u => u.Username == req.Username);
+        Console.WriteLine(user);
         if (
             user is null
             || !AuthHelpers.VerifyHash(
