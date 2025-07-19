@@ -80,7 +80,6 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
                     u.Id == Guid.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
                 ) ?? throw new BadRequestException("User not found.");
 
-        db.UserRefreshTokens.RemoveRange(user.RefreshTokens);
         db.Users.Remove(user);
         await db.SaveChangesAsync();
         context.Response.Cookies.Delete("refreshToken");
@@ -99,8 +98,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         db.UserRefreshTokens.Remove(userRefreshToken);
 
         if (
-            userRefreshToken.User is null
-            || !AuthHelpers.VerifyHash(
+            !AuthHelpers.VerifyHash(
                 refreshToken.TokenValue,
                 userRefreshToken.RefreshToken,
                 Convert.FromBase64String(userRefreshToken.Salt)
@@ -108,13 +106,13 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         )
         {
             await db.SaveChangesAsync();
-            throw new RefreshTokenException("User not found for refresh token.");
+            throw new RefreshTokenException("Invalid hash in refresh token.");
         }
 
         if (userRefreshToken.Expiry <= DateTime.UtcNow)
         {
             await db.SaveChangesAsync();
-            throw new RefreshTokenException("Refresh token expired.", userSafe: true);
+            throw new RefreshTokenException("Session expired.", userSafe: true);
         }
 
         await AuthHelpers.GenerateAndSaveRefreshTokenAsync(userRefreshToken.User, context, db);
