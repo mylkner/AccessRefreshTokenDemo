@@ -95,7 +95,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
             await db
                 .UserRefreshTokens.Include(rt => rt.User)
                 .FirstOrDefaultAsync(rt => rt.Id == Guid.Parse(refreshToken.TokenId))
-            ?? throw new UnauthorizedException("Missing refresh token from db.");
+            ?? throw new RefreshTokenException("Missing refresh token from db.");
 
         db.UserRefreshTokens.Remove(userRefreshToken);
         if (
@@ -108,7 +108,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         )
         {
             await db.SaveChangesAsync();
-            throw new UnauthorizedException("Invalid refresh token.");
+            throw new RefreshTokenException("Invalid refresh token.");
         }
         await AuthHelpers.GenerateAndSaveRefreshTokenAsync(userRefreshToken.User, context, db);
         return AuthHelpers.GenerateToken(userRefreshToken.User, configuration);
