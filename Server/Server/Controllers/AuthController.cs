@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models.Db;
-using Server.Models.Dtos;
+using Server.Models;
 using Server.Services.Interfaces;
 
 namespace Server.Controllers;
@@ -13,20 +12,14 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpPost("register")]
     public async Task<ActionResult<string>> Register(UserDto userDto)
     {
-        User? user = await authService.RegisterAsync(userDto);
-        if (user is null)
-            return BadRequest("Username already exists.");
-
+        await authService.RegisterAsync(userDto);
         return Created();
     }
 
     [HttpPost("login")]
     public async Task<ActionResult<string>> Login(UserDto userDto)
     {
-        string? jwt = await authService.LoginAsync(userDto, HttpContext);
-        if (jwt is null)
-            return BadRequest("Invalid username or password.");
-
+        string jwt = await authService.LoginAsync(userDto, HttpContext);
         return Ok(jwt);
     }
 
@@ -49,7 +42,7 @@ public class AuthController(IAuthService authService) : ControllerBase
     [HttpGet("refresh-token")]
     public async Task<ActionResult<string>> RefreshToken()
     {
-        string? jwt = await authService.ValidateAndReplaceRefreshTokenAsync(HttpContext);
+        string jwt = await authService.ValidateAndReplaceRefreshTokenAsync(HttpContext);
         return Ok(jwt);
     }
 

@@ -1,13 +1,13 @@
-using Server.Models.Db;
-using Server.Models.Dtos;
+using Server.Data.Schema;
+using Server.Models;
 
 namespace Server.Services.Interfaces;
 
 public interface IAuthService
 {
-    public Task<User?> RegisterAsync(UserDto req);
-    public Task<string?> LoginAsync(UserDto req, HttpContext context);
-    public Task<User?> LogoutAsync(HttpContext context);
-    public Task<User?> DeleteAsync(HttpContext context);
-    public Task<string?> ValidateAndReplaceRefreshTokenAsync(HttpContext context);
+    public Task RegisterAsync(UserDto req);
+    public Task<string> LoginAsync(UserDto req, HttpContext context);
+    public Task LogoutAsync(HttpContext context);
+    public Task DeleteAsync(HttpContext context);
+    public Task<string> ValidateAndReplaceRefreshTokenAsync(HttpContext context);
 }
