@@ -60,7 +60,7 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
 
         RefreshTokenDto refreshToken = AuthHelpers.ParseRefreshToken(context)!;
         UserRefreshToken? userRefreshToken = user.RefreshTokens.Find(rt =>
-            rt.Id == Guid.Parse(refreshToken.TokenId)
+            rt.Id == refreshToken.TokenId
         );
 
         if (userRefreshToken is not null)
@@ -94,12 +94,13 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         UserRefreshToken? userRefreshToken =
             await db
                 .UserRefreshTokens.Include(rt => rt.User)
-                .FirstOrDefaultAsync(rt => rt.Id == Guid.Parse(refreshToken.TokenId))
+                .FirstOrDefaultAsync(rt => rt.Id == refreshToken.TokenId)
             ?? throw new RefreshTokenException("Missing refresh token from db.");
 
         db.UserRefreshTokens.Remove(userRefreshToken);
+
         if (
-            userRefreshToken.Expiry <= DateTime.UtcNow
+            userRefreshToken.User is null
             || !AuthHelpers.VerifyHash(
                 refreshToken.TokenValue,
                 userRefreshToken.RefreshToken,
@@ -108,8 +109,15 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         )
         {
             await db.SaveChangesAsync();
-            throw new RefreshTokenException("Invalid refresh token.");
+            throw new RefreshTokenException("User not found for refresh token.");
         }
+
+        if (userRefreshToken.Expiry <= DateTime.UtcNow)
+        {
+            await db.SaveChangesAsync();
+            throw new RefreshTokenException("Refresh token expired.", userSafe: true);
+        }
+
         await AuthHelpers.GenerateAndSaveRefreshTokenAsync(userRefreshToken.User, context, db);
         return AuthHelpers.GenerateToken(userRefreshToken.User, configuration);
     }
