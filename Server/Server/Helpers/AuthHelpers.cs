@@ -104,10 +104,12 @@ public static class AuthHelpers
     {
         string? cookie =
             context.Request.Cookies["refreshToken"]
-            ?? throw new UnauthorizedException("Cookie not provided.");
+            ?? throw new RefreshTokenException("Cookie not provided.");
         string[] parts = cookie.Split(":");
         if (parts.Length != 2)
-            throw new UnauthorizedException("Cookie in invalid format.");
+            throw new RefreshTokenException("Cookie in invalid format.");
+        if (!Guid.TryParse(parts[0], out _))
+            throw new RefreshTokenException("Invalid token ID in cookie.");
         return new() { TokenId = parts[0], TokenValue = parts[1] };
     }
 }
