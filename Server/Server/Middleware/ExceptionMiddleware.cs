@@ -1,11 +1,11 @@
 using System.Net;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using Server.Models.Errors;
+using Server.Errors;
 
 namespace Server.Middleware;
 
-public class ExceptionMiddleware(IHostEnvironment env) : IExceptionHandler
+public class ExceptionMiddleware(ILogger<ExceptionMiddleware> logger) : IExceptionHandler
 {
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext,
@@ -14,37 +14,27 @@ public class ExceptionMiddleware(IHostEnvironment env) : IExceptionHandler
     )
     {
         ProblemDetails errorRes = new();
-        if (!env.IsDevelopment())
+
+        if (exception is CustomExceptionBase customException && customException.UserSafe)
         {
-            errorRes.Detail = "An unexpected error occurred.";
-            errorRes.Status = (int)HttpStatusCode.InternalServerError;
-            errorRes.Title = "Internal Server Error";
+            errorRes.Detail = customException.Message;
+            errorRes.Status = customException.StatusCode;
+            errorRes.Title = customException.GetType().Name.Replace("Exception", "");
         }
         else
         {
-            errorRes.Detail = exception.Message;
-            errorRes.Status = GetStatusCode(exception);
-            errorRes.Title = "An error has occured.";
+            errorRes.Detail = "An internal server error has occured.";
+            errorRes.Status = (int)HttpStatusCode.InternalServerError;
+            errorRes.Title = "Internal Server Error";
         }
 
-        if (exception is RefreshTokenError)
-            httpContext.Response.Cookies.Delete("refreshToken");
+        logger.LogError(
+            exception,
+            "Unhandled exception | Trace ID: {httpContext.TraceIdentifier}",
+            httpContext.TraceIdentifier
+        );
 
         await httpContext.Response.WriteAsJsonAsync(errorRes, cancellationToken: cancellationToken);
         return true;
-    }
-
-    private static int GetStatusCode(Exception ex)
-    {
-        if (ex is RefreshTokenError refreshEx)
-            ex = refreshEx.OriginalEx;
-        return ex switch
-        {
-            BadHttpRequestException => (int)HttpStatusCode.BadRequest,
-            UnauthorizedAccessException => (int)HttpStatusCode.Unauthorized,
-            ForbiddenException => (int)HttpStatusCode.Forbidden,
-            NotFoundException => (int)HttpStatusCode.NotFound,
-            _ => (int)HttpStatusCode.InternalServerError,
-        };
     }
 }
