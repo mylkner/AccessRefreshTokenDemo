@@ -34,7 +34,6 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
     public async Task<string> LoginAsync(UserDto req, HttpContext context)
     {
         User? user = await db.Users.FirstOrDefaultAsync(u => u.Username == req.Username);
-        Console.WriteLine(user);
         if (
             user is null
             || !AuthHelpers.VerifyHash(
