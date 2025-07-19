@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Server.Data.Schema;
+using Server.Errors;
 using Server.Models;
 
 namespace Server.Helpers;
@@ -78,10 +79,10 @@ public static class AuthHelpers
     {
         string? cookie =
             context.Request.Cookies["refreshToken"]
-            ?? throw new UnauthorizedAccessException("Cookie not provided.");
+            ?? throw new UnauthorizedException("Cookie not provided.");
         string[] parts = cookie.Split(":");
         if (parts.Length != 2)
-            throw new UnauthorizedAccessException("Cookie in invalid format.");
+            throw new UnauthorizedException("Cookie in invalid format.");
         return new() { TokenId = parts[0], TokenValue = parts[1] };
     }
 }
