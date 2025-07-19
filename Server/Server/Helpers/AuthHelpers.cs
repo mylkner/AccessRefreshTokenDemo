@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
+using Server.Data;
 using Server.Data.Schema;
 using Server.Errors;
 using Server.Models;
@@ -58,6 +59,30 @@ public static class AuthHelpers
         );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
+    }
+
+    public static async Task<UserRefreshToken> GenerateAndSaveRefreshTokenAsync(
+        User user,
+        HttpContext context,
+        AppDbContext db
+    )
+    {
+        string salt = GenerateRandomString(16);
+        string refreshTokenPlain = GenerateRandomString(32);
+        byte[] hashedRefreshToken = HashString(refreshTokenPlain, Convert.FromBase64String(salt));
+
+        UserRefreshToken userRefreshToken = new()
+        {
+            RefreshToken = Convert.ToBase64String(hashedRefreshToken),
+            Salt = salt,
+            Expiry = DateTime.UtcNow.AddDays(7),
+            User = user,
+        };
+
+        db.UserRefreshTokens.Add(userRefreshToken);
+        await db.SaveChangesAsync();
+        SetRefreshCookie(context, userRefreshToken.Id.ToString(), refreshTokenPlain);
+        return userRefreshToken;
     }
 
     public static void SetRefreshCookie(HttpContext context, string tokenId, string tokenValue)
