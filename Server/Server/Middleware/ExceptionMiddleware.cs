@@ -19,17 +19,16 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
         if (exception is RefreshTokenException)
             httpContext.Response.Cookies.Delete("refreshToken");
 
-        if (exception is CustomExceptionBase customException && customException.UserSafe)
+        if (exception is CustomExceptionBase customException)
         {
-            errorRes.Detail = customException.Message;
-            errorRes.Status = customException.StatusCode;
-            errorRes.Title = customException.GetType().Name.Replace("Exception", "");
-        }
-        else if (env.IsDevelopment())
-        {
-            errorRes.Detail = exception.Message;
-            errorRes.Status = (int)HttpStatusCode.InternalServerError;
-            errorRes.Title = "Internal Server Error";
+            bool showDetails = env.IsDevelopment() || customException.UserSafe;
+            errorRes.Detail = showDetails ? customException.Message : "An error has occurred.";
+            errorRes.Status = showDetails
+                ? customException.StatusCode
+                : (int)HttpStatusCode.InternalServerError;
+            errorRes.Title = showDetails
+                ? customException.GetType().Name.Replace("Exception", "")
+                : "Internal Server Error";
         }
         else
         {
