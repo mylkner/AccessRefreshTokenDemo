@@ -1,7 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { createContext, useContext, useState, type Dispatch } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    type Dispatch,
+} from "react";
 import Spinner from "../components/Spinner";
+import { setupInterceptors } from "../axios/axiosInstance";
 
 interface AuthContextProps {
     accessToken: string | null;
@@ -16,6 +23,15 @@ const AuthContext = createContext<AuthContextProps | null>(null);
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
     const [accessToken, setAccessToken] = useState<string | null>(null);
+
+    useEffect(
+        () =>
+            setupInterceptors(
+                () => accessToken,
+                (token) => setAccessToken(token)
+            ),
+        [accessToken]
+    );
 
     const { isLoading } = useQuery({
         queryKey: ["checkAuth"],
