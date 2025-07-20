@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import Spinner from "./Spinner";
 import axios, { AxiosError } from "axios";
-import { useAuth } from "../context/UserContext";
+import { useAuthStore } from "../store/zustand";
 
 interface FormData {
     username: string;
@@ -15,7 +15,7 @@ interface LoginRegisterFormProps {
 }
 
 const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
-    const { setAccessToken } = useAuth();
+    const { setAccessToken } = useAuthStore((state) => state);
     const navigate = useNavigate();
     const mutation = useMutation({
         mutationFn: async (formData: FormData): Promise<string> => {

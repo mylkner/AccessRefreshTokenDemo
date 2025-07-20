@@ -1,8 +1,8 @@
 import { Navigate, Outlet } from "react-router";
-import { useAuth } from "../context/UserContext";
+import { useAuthStore } from "../store/zustand";
 
 const AuthLayout = () => {
-    const { accessToken } = useAuth();
+    const { accessToken } = useAuthStore((state) => state);
     return !accessToken ? <Navigate to="/" /> : <Outlet />;
 };
 
