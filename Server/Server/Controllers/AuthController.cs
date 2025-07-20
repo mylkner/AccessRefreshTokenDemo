@@ -46,6 +46,14 @@ public class AuthController(IAuthService authService) : ControllerBase
         return Ok(jwt);
     }
 
+    [HttpPut("change-role")]
+    [Authorize]
+    public async Task<ActionResult<string>> ChangeRoleEndpoint()
+    {
+        string jwt = await authService.ChangeRole(HttpContext);
+        return Ok(jwt);
+    }
+
     [HttpGet]
     [Authorize]
     public IActionResult AuthEndpoint()

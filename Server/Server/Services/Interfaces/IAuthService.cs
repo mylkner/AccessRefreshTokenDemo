@@ -10,4 +10,5 @@ public interface IAuthService
     public Task LogoutAsync(HttpContext context);
     public Task DeleteAsync(HttpContext context);
     public Task<string> ValidateAndReplaceRefreshTokenAsync(HttpContext context);
+    public Task<string> ChangeRole(HttpContext context);
 }

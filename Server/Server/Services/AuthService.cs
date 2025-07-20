@@ -105,4 +105,16 @@ public class AuthService(AppDbContext db, IConfiguration configuration) : IAuthS
         await AuthHelpers.GenerateAndSaveRefreshTokenAsync(userRefreshToken.User, context, db);
         return AuthHelpers.GenerateToken(userRefreshToken.User, configuration);
     }
+
+    public async Task<string> ChangeRole(HttpContext context)
+    {
+        User? user =
+            await db.Users.FindAsync(
+                Guid.Parse(context.User.FindFirst(ClaimTypes.NameIdentifier)!.Value)
+            ) ?? throw new BadRequestException("User not found.");
+
+        user.Role = user.Role == "User" ? "Admin" : "User";
+        await db.SaveChangesAsync();
+        return AuthHelpers.GenerateToken(user, configuration);
+    }
 }
