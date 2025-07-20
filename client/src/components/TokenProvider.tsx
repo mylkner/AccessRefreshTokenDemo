@@ -16,6 +16,7 @@ const TokenProvider = ({ children }: TokenProviderProps) => {
         queryFn: async () => {
             const { data } = await axios.get("/api/auth/refresh-token");
             setAccessToken(data);
+            return data;
         },
         retry: false,
         refetchOnWindowFocus: false,
