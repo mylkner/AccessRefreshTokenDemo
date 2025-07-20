@@ -93,7 +93,7 @@ const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
     );
 
     return (
-        <div className="flex items-center justify-center h-screen w-full">
+        <form className="flex items-center justify-center h-screen w-full">
             <div className="flex flex-col gap-4 items-center justify-center h-screen w-[40%] text-white text-2xl">
                 <span className="mb-10 text-3xl">{formType}</span>
                 {usernameInput}
@@ -112,7 +112,7 @@ const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
                     Home
                 </Link>
             </div>
-        </div>
+        </form>
     );
 };
 
