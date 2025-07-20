@@ -28,7 +28,8 @@ const LoginRegisterForm = ({ formType }: LoginRegisterFormProps) => {
         },
         onSuccess: (data) => {
             setAccessToken(data);
-            navigate("/dashboard");
+            if (formType === "Login") navigate("/dashboard");
+            else navigate("/login");
         },
     });
 
