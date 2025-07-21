@@ -19,23 +19,27 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
         if (exception is RefreshTokenException)
             httpContext.Response.Cookies.Delete("refreshToken");
 
+        bool showDetails = !env.IsDevelopment();
+        string title = "Internal Server Error";
+        int statusCode = (int)HttpStatusCode.InternalServerError;
+        string detail = "An error has occurred.";
+
         if (exception is CustomExceptionBase customException)
         {
-            bool showDetails = env.IsDevelopment() || customException.UserSafe;
-            errorRes.Detail = showDetails ? customException.Message : "An error has occurred.";
-            errorRes.Status = showDetails
-                ? customException.StatusCode
-                : (int)HttpStatusCode.InternalServerError;
-            errorRes.Title = showDetails
-                ? customException.GetType().Name.Replace("Exception", "")
-                : "Internal Server Error";
+            showDetails = showDetails || customException.UserSafe;
+            title = showDetails ? customException.GetType().Name.Replace("Exception", "") : title;
+            statusCode = showDetails ? customException.StatusCode : statusCode;
+            detail = showDetails ? customException.Message : detail;
         }
-        else
+        else if (showDetails)
         {
-            errorRes.Detail = "An internal server error has occurred.";
-            errorRes.Status = (int)HttpStatusCode.InternalServerError;
-            errorRes.Title = "Internal Server Error";
+            title = exception.GetType().Name.Replace("Exception", "");
+            detail = exception.Message;
         }
+
+        errorRes.Status = statusCode;
+        errorRes.Detail = detail;
+        errorRes.Title = title;
 
         logger.LogError(
             exception,
