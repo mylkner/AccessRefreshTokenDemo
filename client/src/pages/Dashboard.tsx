@@ -4,6 +4,7 @@ import { useAuthStore } from "../store/zustand";
 import { useEffect, useState } from "react";
 import { AxiosError } from "axios";
 import { jwtDecode, type JwtPayload } from "jwt-decode";
+import { type ErrorDetails } from "../axios/axiosErrorType";
 
 interface UserInfo extends JwtPayload {
     "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"?: string;
@@ -13,7 +14,7 @@ interface UserInfo extends JwtPayload {
 
 const Dashboard = () => {
     const { accessToken, setAccessToken } = useAuthStore((state) => state);
-    const [res, setRes] = useState("");
+    const [res, setRes] = useState<string | undefined>("");
     const [userInfo, setUserInfo] = useState({});
 
     useEffect(() => {
@@ -38,19 +39,16 @@ const Dashboard = () => {
         }
     }, [accessToken]);
 
-    const user = useMutation({
+    const user = useMutation<string, AxiosError<ErrorDetails>>({
         mutationFn: async () => {
             const res = await axiosInstance.get("/api/auth");
             return res.data;
         },
         onSuccess: (data) => setRes(data),
-        onError: (error) =>
-            error instanceof AxiosError
-                ? setRes(error.response?.data?.detail)
-                : setRes(error.message),
+        onError: (error) => setRes(error.response?.data?.detail),
     });
 
-    const admin = useMutation({
+    const admin = useMutation<string>({
         mutationFn: async () => {
             const res = await axiosInstance.get("/api/auth/admin");
             return res.data;
@@ -59,7 +57,7 @@ const Dashboard = () => {
         onError: () => setRes("Forbidden"),
     });
 
-    const changeRole = useMutation({
+    const changeRole = useMutation<string>({
         mutationFn: async () => {
             const res = await axiosInstance.put("/api/auth/change-role");
             return res.data;
@@ -70,7 +68,7 @@ const Dashboard = () => {
         },
     });
 
-    const logout = useMutation({
+    const logout = useMutation<string>({
         mutationFn: async () => {
             const res = await axiosInstance.get("/api/auth/logout");
             return res.data;
@@ -80,7 +78,7 @@ const Dashboard = () => {
         },
     });
 
-    const deleteEndpoint = useMutation({
+    const deleteEndpoint = useMutation<string>({
         mutationFn: async () => {
             const res = await axiosInstance.delete("/api/auth/delete");
             return res.data;
