@@ -19,7 +19,7 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
         if (exception is RefreshTokenException)
             httpContext.Response.Cookies.Delete("refreshToken");
 
-        bool showDetails = !env.IsDevelopment();
+        bool showDetails = env.IsDevelopment();
         string title = "Internal Server Error";
         int statusCode = (int)HttpStatusCode.InternalServerError;
         string detail = "An error has occurred.";
