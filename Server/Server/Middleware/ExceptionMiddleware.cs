@@ -41,11 +41,11 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
         errorRes.Detail = detail;
         errorRes.Title = title;
 
-        logger.LogError(
-            exception,
-            "Unhandled exception | Trace ID: {TraceIdentifier}",
-            httpContext.TraceIdentifier
-        );
+        // logger.LogError(
+        //     exception,
+        //     "Unhandled exception | Trace ID: {TraceIdentifier}",
+        //     httpContext.TraceIdentifier
+        // );
 
         httpContext.Response.StatusCode = errorRes.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(errorRes, cancellationToken: cancellationToken);
