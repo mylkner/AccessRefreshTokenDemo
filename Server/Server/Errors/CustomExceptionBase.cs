@@ -6,7 +6,7 @@ public abstract class CustomExceptionBase : Exception
     public bool UserSafe { get; }
     public int StatusCode { get; }
     public string Title { get; }
-    public string Detail { get; set; }
+    public string? Detail { get; set; }
     public string? Instance { get; set; }
     public string? TraceId { get; set; }
 
