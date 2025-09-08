@@ -26,6 +26,7 @@ public static class ServiceCollectionExtensions
     {
         services.AddControllers();
         services.AddOpenApi();
+        services.AddProblemDetails();
         services.AddScoped<IAuthService, AuthService>();
         return services;
     }
@@ -35,7 +36,7 @@ public static class ServiceCollectionExtensions
         IConfiguration configuration
     )
     {
-        services.AddExceptionHandler<ExceptionMiddleware>();
+        services.AddExceptionHandler<ExceptionMiddleware>( );
         services
             .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>

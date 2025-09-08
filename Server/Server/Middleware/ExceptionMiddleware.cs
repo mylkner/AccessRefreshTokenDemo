@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Server.Errors;
 
 namespace Server.Middleware;
@@ -16,16 +17,16 @@ public class ExceptionMiddleware(IHostEnvironment env, ILogger<ExceptionMiddlewa
 
         CustomExceptionBase errorRes =
             exception as CustomExceptionBase ?? new InternalServerErrorException(exception.Message);
-        errorRes.SetDetails(httpContext, env.IsDevelopment());
+        ProblemDetails problemDetails = errorRes.ToProblemDetails(httpContext, env.IsDevelopment());
 
         logger.LogError(
             exception,
             "Unhandled exception | Trace ID: {TraceIdentifier}",
-            errorRes.TraceId
+            problemDetails.Extensions["traceId"]
         );
 
         httpContext.Response.StatusCode = errorRes.StatusCode;
-        await httpContext.Response.WriteAsJsonAsync(errorRes, cancellationToken: cancellationToken);
+        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken: cancellationToken);
         return true;
     }
 }
