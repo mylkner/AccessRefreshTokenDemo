@@ -26,7 +26,6 @@ public static class ServiceCollectionExtensions
     {
         services.AddControllers();
         services.AddOpenApi();
-        services.AddProblemDetails();
         services.AddScoped<IAuthService, AuthService>();
         return services;
     }

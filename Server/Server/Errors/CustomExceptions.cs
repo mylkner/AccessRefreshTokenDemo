@@ -2,24 +2,20 @@ using System.Net;
 
 namespace Server.Errors;
 
-public abstract class CustomExceptionBase(string message, bool userSafe, int StatusCode)
-    : Exception(message)
-{
-    public bool UserSafe { get; set; } = userSafe;
-    public int StatusCode { get; set; } = StatusCode;
-}
-
 public class BadRequestException(string message, bool userSafe = false)
-    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.BadRequest);
+    : CustomExceptionBase((int)HttpStatusCode.BadRequest, message, userSafe);
 
 public class UnauthorizedException(string message, bool userSafe = false)
-    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Unauthorized);
+    : CustomExceptionBase((int)HttpStatusCode.Unauthorized, message, userSafe);
 
 public class RefreshTokenException(string message, bool userSafe = false)
-    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Unauthorized);
+    : CustomExceptionBase((int)HttpStatusCode.Unauthorized, message, userSafe);
 
 public class ForbiddenException(string message, bool userSafe = false)
-    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.Forbidden);
+    : CustomExceptionBase((int)HttpStatusCode.Forbidden, message, userSafe);
 
 public class NotFoundException(string message, bool userSafe = false)
-    : CustomExceptionBase(message, userSafe, (int)HttpStatusCode.NotFound);
+    : CustomExceptionBase((int)HttpStatusCode.NotFound, message, userSafe);
+
+public class InternalServerErrorException(string message, bool userSafe = false)
+    : CustomExceptionBase((int)HttpStatusCode.InternalServerError, message, userSafe);
