@@ -21,7 +21,7 @@ public abstract class CustomExceptionBase : Exception
             Type = $"https://httpstatuses.com/{StatusCode}",
             Status = StatusCode,
             Title = ReasonPhrases.GetReasonPhrase(StatusCode),
-            Detail = (UserSafe || envIsDev) ? Message : "An error occurred",
+            Detail = (UserSafe || envIsDev) ? Message : "An error occurred.",
             Instance = context.Request.Path,
             Extensions = { ["traceId"] = context.TraceIdentifier }
         };
