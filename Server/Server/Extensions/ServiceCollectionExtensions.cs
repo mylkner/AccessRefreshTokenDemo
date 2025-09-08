@@ -11,7 +11,7 @@ namespace Server.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddAllServices(
+    public static IServiceCollection ConfigureServices(
         this IServiceCollection services,
         IConfiguration configuration
     )
